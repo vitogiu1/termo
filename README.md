@@ -22,7 +22,7 @@ O objetivo é adivinhar uma palavra secreta de 5 letras em no máximo 6 tentativ
 2. **Sorteio Aleatório:** Utiliza o relógio do sistema como semente (`srand(time(NULL))`) para garantir que a palavra secreta seja diferente a cada nova partida.
 3. **Validação de Palpites:** O jogo valida se a palavra digitada possui exatamente 5 letras e se ela realmente existe no dicionário. Caso seja inválida, o jogador é alertado e não perde a tentativa.
 4. **Normalizador UTF-8 nativo:** O sistema aceita palavras com acentos ou cedilha (ex: "maçã") e as normaliza automaticamente para o padrão do jogo (ex: "MACA"), evitando bugs de tamanho de string comuns no terminal do Windows.
-5. **Efeito de Saída:** Utiliza manipulação de fluxo com `\r` (carriage return) e as biblioteca `<chronos>` e `<thread>`para criar uma contagem regressiva visual antes de fechar o prompt de comando.
+5. **Efeito de Saída:** Utiliza manipulação de fluxo com `\r` (carriage return) e as bibliotecas `<chronos>` e `<thread>`para criar uma contagem regressiva visual antes de fechar o prompt de comando.
 
 ---
 
