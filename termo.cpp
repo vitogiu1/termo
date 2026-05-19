@@ -12,7 +12,8 @@ Normalização de acentos e cedilha integrada na leitura e no sorteio para compa
 #include <fstream>
 #include <cctype>
 #include <vector>
-#include <windows.h>
+#include <chrono>
+#include <thread>
 using namespace std;
 
 //tira acentos e cedilha, "normaliza" a palavra e a joga para MAIÚSCULO
@@ -25,6 +26,8 @@ string normalizar_palavra(string palavra) {
             resultado += toupper(c);
         } 
         else if (c == 195 || c == 196 || c == 197) {
+            if (i + 1 >= palavra.length())
+                break;
             i++; 
             unsigned char proximo = palavra[i];
             
@@ -80,7 +83,7 @@ int main() {
     int indice_sorteado = rand() % total_de_palavras; 
     
     // CORREÇÃO AQUI: Garante que mesmo se a lógica anterior mudar, a palavra sorteada passa pelo filtro
-    string certa = normalizar_palavra(lista_palavras[indice_sorteado]); 
+    string certa = lista_palavras[indice_sorteado]; 
 
     string palpite; // CHUTE
     
@@ -105,10 +108,13 @@ int main() {
     int k = 1; // sentinela controladora de tentativas
     
     while (k <= 6) {
-        int usados[] = {0, 0, 0, 0, 0}; // letras usadas
-        int certos[] = {0, 0, 0, 0, 0}; // letras certas nas posicoes certas
-        int errados[] = {0, 0, 0, 0, 0}; // letras certas nas posicoes erradas
+        int status[5] = {0,0,0,0,0};
+        // 0 = nao existe
+        // 1 = existe lugar errado
+        // 2 = lugar certo
 
+        int usados[5] = {0,0,0,0,0};
+        // controla letras da palavra secreta ja consumidas
         cout << "\nTentativa " << k << " de 6 - Insira seu chute: ";
         cin >> palpite;
 
@@ -123,7 +129,7 @@ int main() {
 
         // Validador de palavra existente no dicionário
         int palavra_valida = 0;
-        for (int i = 0; i < lista_palavras.size(); i++) {
+        for (size_t i = 0; i < lista_palavras.size(); i++) {
             if (palpite == lista_palavras[i]) {
                 palavra_valida = 1;
                 break;
@@ -138,32 +144,33 @@ int main() {
         // primeiro teste para ver se a letra esta na posicao correta da palavra referencia e do palpite
         for (int i = 0; i < 5; i++) {
             if (palpite[i] == certa[i]) {
-                certos[i] = 1; 
-                usados[i] = 1;
+                status[i] = 2;
+                usados[i] = 1; 
             }
         }
 
         // o proximo laco eh pra verificar as letras certas na posicao errada
         for (int i = 0; i < 5; i++) {
-            if (certos[i] == 1) {
+            if (status[i] == 2) {
                 continue; 
             }
             for (int j = 0; j < 5; j++) {
-                if (palpite[i] == certa[j] and usados[j] == 0) {
-                    errados[i] = 1;
+                if (palpite[i] == certa[j] && usados[j] == 0) {
+                    status[i] = 1;
                     usados[j] = 1;
                     break;
                 }
+                
             }
         }
 
         int numero_acertos = 0;
         for (int i = 0; i < 5; i++) {
-            if (certos[i] == 1) {
+            if (status[i] == 2) {
                 cout << (char)toupper(palpite[i]) << " ";
                 numero_acertos++;
             }
-            else if (errados[i] == 1) {
+            else if (status[i] == 1) {
                 cout << "(" << (char)tolower(palpite[i]) << ")" << " ";
             }
             else {
@@ -186,10 +193,12 @@ int main() {
     }
 
     // Contagem regressiva para fechar o terminal
-    for (int i = 0; i < 11; i++) {
-        Sleep(1000);
-        cout << "\rSaindo em " << 10 - i << " segundos... ";
+    
+    for (int i = 10; i > 0; i--) {
+        this_thread::sleep_for(chrono::milliseconds(1000));
+        cout << "\rSaindo em " << i << " segundos... ";
     }
+    
     
     return 0;    
 }
