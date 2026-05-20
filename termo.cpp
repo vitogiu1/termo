@@ -22,7 +22,9 @@ string normalizar_palavra(string palavra) {
         unsigned char c = palavra[i];
         
         if (c < 128) {
-            resultado += toupper(c);
+            if(c != '\r' && c != '\n') { // Ignora caracteres de nova linha e carriage return
+                resultado += toupper(c);
+            } 
         } 
         else if (c == 195 || c == 196 || c == 197) {
             if (i + 1 >= palavra.length())
@@ -73,6 +75,10 @@ void ativarANSI() {
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
     SetConsoleMode(hOut, dwMode);
+
+    // Força o interpretador a usar UTF-8 no CIn e COut para evitar problemas com acentos 
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
 #endif
 }
 
